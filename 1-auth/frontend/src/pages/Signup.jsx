@@ -8,14 +8,17 @@ function Signup() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:5000/api/users/signup', {
-        email,
-        password,
-      });
-      alert('succesfull signup.');
+      const response = await axios.post(
+        'http://localhost:5000/api/users/signup',
+        { email, password },
+        { withCredentials: true },
+      );
+
+      console.log('STATUS:', response.status);
+      alert('successful signup');
     } catch (err) {
-      console.log(err);
-      alert('Signup failed');
+      console.log('ERROR STATUS:', err.response?.status);
+      console.log('FULL ERROR:', err);
     }
   };
 
@@ -24,6 +27,7 @@ function Signup() {
       <form onSubmit={handleSubmit}>
         <label>Email</label>
         <input
+          name="email"
           type="text"
           required
           placeholder="Enter your email"
@@ -33,6 +37,7 @@ function Signup() {
         <label>Password</label>
 
         <input
+          name="password"
           type="text"
           required
           placeholder="Enter your password"

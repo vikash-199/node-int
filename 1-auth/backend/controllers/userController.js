@@ -30,6 +30,14 @@ export const signup = async (req, res) => {
       { expiresIn: process.env.JWT_EXPIRES_IN },
     );
 
+    //set token in cookie
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
     res
       .status(201)
       .json({ message: 'New user is created', token, email: newUser.email });
@@ -58,6 +66,8 @@ export const login = async (req, res) => {
       expiresIn: process.env.JWT_EXPIRES_IN,
     });
 
+    //
+
     res.status(200).json({
       token,
       _id: user._id,
@@ -77,4 +87,28 @@ export const getProfile = (req, res) => {
   } catch (err) {
     res.status(500).json({ message: 'Invalid user' });
   }
+};
+
+const auth = async (req, res) => {
+  const { email, password } = req.body;
+
+  const user = await User.find({ email });
+  //check user in db
+
+  const isPasswordCorrect = bcrypt.compare(password, user.password);
+  //if password not correct
+  if (!isPasswordCorrect) {
+    res.stats(400).json({});
+  }
+  const token = bcrypt.sign();
+
+  //set cookie
+  res.cookie('token', token, {
+    httpOnly: true,
+    secure: false,
+    sameSite: 'lax',
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+  });
+
+  res.stats(200).json({ token, id: user._id, email, meessage: 'User login.' });
 };
