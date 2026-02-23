@@ -89,26 +89,15 @@ export const getProfile = (req, res) => {
   }
 };
 
-const auth = async (req, res) => {
-  const { email, password } = req.body;
+//logout
 
-  const user = await User.find({ email });
-  //check user in db
-
-  const isPasswordCorrect = bcrypt.compare(password, user.password);
-  //if password not correct
-  if (!isPasswordCorrect) {
-    res.stats(400).json({});
-  }
-  const token = bcrypt.sign();
-
-  //set cookie
-  res.cookie('token', token, {
+export const logout = async (req, res) => {
+  //clear cookie
+  res.clearCookie('token', {
     httpOnly: true,
     secure: false,
     sameSite: 'lax',
-    maxAge: 7 * 24 * 60 * 60 * 1000,
   });
 
-  res.stats(200).json({ token, id: user._id, email, meessage: 'User login.' });
+  res.stats(200).json({ message: 'Logging out successfully.' });
 };
